@@ -38,8 +38,7 @@ FusionEKF::FusionEKF() {
     * Finish initializing the FusionEKF.
     * Set the process and measurement noises
   */
-  noise_ax = 9;
-  noise_ay = 9;
+
 
   // Initializing P
   ekf_.P_ = MatrixXd(4, 4);
@@ -76,9 +75,24 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     // first measurement
     if(measurement_pack.sensor_type_ == MeasurementPackage::RADAR)
     {
-    	ekf_.x_=tools.Polar2Cart(measurement_pack.raw_measurements_);
+        double rho = measurement_pack.raw_measurements_[0]; // range
+    	  double phi = measurement_pack.raw_measurements_[1]; // bearing
+    	  double rho_dot = measurement_pack.raw_measurements_[2]; // velocity of rho
+    	  // Coordinates convertion from polar to cartesian
+    	  double x = rho * cos(phi);
+        if ( x < 0.0001 ) {
+          x = 0.0001;
+        }
+    	  double y = rho * sin(phi);
+        if ( y < 0.0001 ) {
+          y = 0.0001;
+        }
+    	  double vx = rho_dot * cos(phi);
+    	  double vy = rho_dot * sin(phi);
+        ekf_.x_ << x, y, vx , vy;
+    	//ekf_.x_=tools.Polar2Cart(measurement_pack.raw_measurements_);
     }
-    else
+    else if (measurement_pack.sensor_type_ == MeasurementPackage::LASER)
     {
     	ekf_.x_ << measurement_pack.raw_measurements_[0], measurement_pack.raw_measurements_[1], 0, 0;
     }
@@ -111,6 +125,8 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
 	double dt_2 = dt * dt;
 	double dt_3 = dt_2 * dt;
 	double dt_4 = dt_3 * dt;
+	double  noise_ax = 9;
+	double  noise_ay = 9;
 
 	//Modify the F matrix so that the time is integrated
 	 // State transition matrix update

@@ -29,7 +29,7 @@ public:
   */
   MatrixXd CalculateJacobian(const VectorXd& x_state);
 
-  VectorXd Polar2Cart(const VectorXd& x_state);
+  VectorXd Polar2Cart(const VectorXd x_state);
 
 };
 

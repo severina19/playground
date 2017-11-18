@@ -95,7 +95,13 @@ VectorXd Tools::Polar2Cart(const VectorXd& x_state) {
 	float px, py,vx,vy;
 
 	px=rho*cos(phi);
+    if ( px < 0.0001 ) {
+    	px = 0.0001;
+    }
 	py=rho*sin(phi);
+    if ( py < 0.0001 ) {
+    	py = 0.0001;
+    }
 	vx=rho_dot*cos(phi);
 	vy=rho_dot*sin(phi);
 	x_cart<<px,py,vx,vy;

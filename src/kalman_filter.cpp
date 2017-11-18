@@ -49,12 +49,12 @@ void KalmanFilter::Update(const VectorXd &z) {
 	P_ = (I - K * H_) * P_;
 }
 
-void KalmanFilter::UpdateEKF(const VectorXd &z) {
+void KalmanFilter::UpdateEKF(const VectorXd &z, MatrixXd &Hj) {
   /**
   TODO:
     * update the state by using Extended Kalman Filter equations
   */
-	Hj=Tools::CalculateJacobian(&z);
+
 	VectorXd z_pred = Hj * x_;
 	VectorXd y = z - z_pred;
 	MatrixXd Ht = Hj.transpose();

@@ -92,6 +92,7 @@ VectorXd Tools::Polar2Cart(const VectorXd& x_state) {
 	float rho = x_state(0);
 	float phi = x_state(1);
 	float rho_dot = x_state(2);
+	float px, py,vx,vy;
 
 	px=rho*cos(phi);
 	py=rho*sin(phi);

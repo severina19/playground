@@ -50,10 +50,7 @@ VectorXd Tools::CalculateRMSE(const vector<VectorXd> &estimations,
 }
 
 MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
-  /**
-  TODO:
-    * Calculate a Jacobian here.
-  */
+
 	MatrixXd Hj(3,4);
 
     if ( x_state.size() != 4 ) {
@@ -72,7 +69,7 @@ MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
 	float c3 = (c1*c2);
 
 	//check division by zero
-	if(fabs(c1) < 0.0001){
+	if(fabs(c1) < EPS){
 		cout << "CalculateJacobian () - Error - Division by Zero" << endl;
 		return Hj;
 	}
@@ -88,10 +85,6 @@ MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
 
 
 VectorXd Tools::Polar2Cart(const VectorXd x_state) {
-  /**
-  TODO:
-    * Calculate a Jacobian here.
-  */
 	VectorXd x_cart(4);
 
     double rho = x_state[0]; // range
@@ -99,16 +92,20 @@ VectorXd Tools::Polar2Cart(const VectorXd x_state) {
 	double rho_dot = x_state[2]; // velocity of rho
 	  // Coordinates convertion from polar to cartesian
 	double x = rho * cos(phi);
-    if ( x < 0.0001 ) {
-      x = 0.0001;
+
+    if ( x < EPS ) {
+      x = EPS;
     }
-	  double y = rho * sin(phi);
-    if ( y < 0.0001 ) {
-      y = 0.0001;
+
+	double y = rho * sin(phi);
+    if ( y < EPS ) {
+      y = EPS;
     }
-	  double vx = rho_dot * cos(phi);
-	  double vy = rho_dot * sin(phi);
-	  x_cart << x, y, vx , vy;
+
+	double vx = rho_dot * cos(phi);
+	double vy = rho_dot * sin(phi);
+
+	x_cart << x, y, vx , vy;
 
 	return x_cart;
 }

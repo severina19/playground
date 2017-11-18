@@ -6,7 +6,7 @@
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 using namespace std;
-
+#define EPS 0.0001
 class Tools {
 public:
   /**

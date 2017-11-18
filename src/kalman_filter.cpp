@@ -1,5 +1,6 @@
 #include "kalman_filter.h"
 #include "tools.h"
+#include "math.h"
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
@@ -37,25 +38,16 @@ void KalmanFilter::Update(const VectorXd &z) {
   */
 	VectorXd z_pred = H_ * x_;
 	VectorXd y = z - z_pred;
-	MatrixXd Ht = H_.transpose();
-	MatrixXd S = H_ * P_ * Ht + R_;
-	MatrixXd Si = S.inverse();
-	MatrixXd PHt = P_ * Ht;
-	MatrixXd K = PHt * Si;
-
-	x_ = x_ + (K * y);
-	long x_size = x_.size();
-	MatrixXd I = MatrixXd::Identity(x_size, x_size);
-	P_ = (I - K * H_) * P_;
+	KF(y);
 }
 
-void KalmanFilter::UpdateEKF(const VectorXd &z, MatrixXd &Hj) {
+void KalmanFilter::UpdateEKF(const VectorXd &z) {
   /**
   TODO:
     * update the state by using Extended Kalman Filter equations
   */
 
-	VectorXd z_pred = Hj * x_;
+	/*VectorXd z_pred = Hj * x_;
 	VectorXd y = z - z_pred;
 	MatrixXd Ht = Hj.transpose();
 	MatrixXd S = Hj * P_ * Ht + R_;
@@ -66,5 +58,28 @@ void KalmanFilter::UpdateEKF(const VectorXd &z, MatrixXd &Hj) {
 	x_ = x_ + (K * y);
 	long x_size = x_.size();
 	MatrixXd I = MatrixXd::Identity(x_size, x_size);
-	P_ = (I - K * Hj) * P_;
+	P_ = (I - K * Hj) * P_;*/
+	  // Recalculate x object state to rho, theta, rho_dot coordinates
+	  double rho = sqrt(x_(0)*x_(0) + x_(1)*x_(1));
+	  double theta = atan(x_(1) / x_(0));
+	  double rho_dot = (x_(0)*x_(2) + x_(1)*x_(3)) / rho;
+	  VectorXd h = VectorXd(3); // h(x_)
+	  h << rho, theta, rho_dot;
+
+	  VectorXd y = z - h;
+	  // Calculations are essentially the same to the Update function
+	  KF(y);
+}
+
+// Universal update Kalman Filter step. Equations from the lectures
+void KalmanFilter::KF(const VectorXd &y){
+  MatrixXd Ht = H_.transpose();
+  MatrixXd S = H_ * P_ * Ht + R_;
+  MatrixXd Si = S.inverse();
+  MatrixXd K =  P_ * Ht * Si;
+  // New state
+  x_ = x_ + (K * y);
+  int x_size = x_.size();
+  MatrixXd I = MatrixXd::Identity(x_size, x_size);
+  P_ = (I - K * H_) * P_;
 }

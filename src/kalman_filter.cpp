@@ -55,6 +55,13 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
 	  h << rho, theta, rho_dot;
 
 	  VectorXd y = z - h;
+      while ( y(1) > M_PI || y(1) < -M_PI ) {
+        if ( y(1) > M_PI ) {
+            y(1) -= M_PI;
+        } else {
+            y(1) += M_PI;
+                }
+        }
 	  // Calculations are essentially the same to the Update function
 	  KF(y);
 }
